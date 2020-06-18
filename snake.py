@@ -26,6 +26,8 @@ class food:
     def changelocation(self):
         self.x = random.randint(0,20)*20 - 200
         self.y = random.randint(0,20)*20 - 200
+        if (self.x, self.y) in game.snake.currentbody:
+            self.changelocation()
 
     def drawself(self,turtle):
         if self.state == "ON":
@@ -156,8 +158,8 @@ class Game:
     def pausepressed(self):
         self.pause = True
         while self.pause == True:
-            userinput = self.screen.textinput("Game Paused","Press r to resume ")
-            if userinput == 'r':
+            unpause = self.screen.textinput("Game Paused","Press r to resume ")
+            if unpause == 'r':
                 self.pause = False
 
 
