@@ -68,7 +68,7 @@ class snake:
                                  self.headposition[1] + 20*self.nextY]
         else:
             self.crashed = True
-            print("you crashed")
+            print("You crashed!")
 
     def moveup(self):
         self.nextX = 0
@@ -164,10 +164,11 @@ class Game:
 
 
 
-
 game = Game()
-time.sleep(3)
-game.nextFrame()
-print("GAME OVER!")
-game.screen.bye()
+play = 'y'
+while play == 'y':
+    game.nextFrame()
+    play = game.screen.textinput("GAME OVER!","Enter y to play again.")
+    game.snake.__init__()
+    game.food.changelocation()
 #game.screen.mainloop()
