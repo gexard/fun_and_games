@@ -68,7 +68,6 @@ class snake:
                                  self.headposition[1] + 20*self.nextY]
         else:
             self.crashed = True
-            print("You crashed!")
 
     def moveup(self):
         self.nextX = 0
