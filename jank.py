@@ -22,44 +22,66 @@ listen.loop_start()
 
 listen.subscribe("Players/+")
 
+def deck():
+    deck = []
+    suites = ['Clubes', 'Hearts','Spades','Diamonds']
+    for i in range(13):
+        suite = suites[i]
+        for j in range(4):
+            if i == 1:
+                deck.append( 'Ace' + ' of ' + suite)
+            elif i < 10:
+                deck.append( str(j) + ' of ' + suite)
+            elif i == 10:
+                deck.append( 'Bubbe' + ' of ' + suite)
+            elif i == 11:
+                deck.append( 'Queen' + ' of ' + suite)
+            elif i == 12:
+                deck.append( 'King' + ' of ' + suite)
+    deck.append('Black Jank')
+    deck.append('Red Jank')
+    return deck
+
+class Player:
+
+    def __init__():
+        self.name = input("Player name: \n")
+
 class Game:
 
     def __init__(self):
-        self.stack =
+        self.deck = CreateStack()
+        self.stacks = {}
 
-    funkyrule1 = 1
-    nextcard = 2
-    pub.publish("Mainstack/nextcard",game.nextcard)
+    def nextCard():
+        l = len(self.deck)
+        r = random.rand(l)
+        self.nextcard = self.deck[r]
+        del self.deck[r]
+        pub.publish("Mainstack/nextcard",game.nextcard)
 
-<<<<<<< HEAD
-game.nextcard = random.rand(52)
+    def shuffle(self):
+        stuff
+
+    def Cuts(self):
+        stuff
+
+    def CallAJank(self):
+        stuff
+
+    def CreateStack(self):
+        stuff
+
+    def KillStack(self):
+
+    def rule1(self):
+        if self.card == 'Jank':
+            print('Game over')
+
+    def cross(self):
+        stuff
 
 no_winner = True
-
-game()
-=======
-Game.stack.nextcard = random(54)
-Game.stack = []
-no_winner = False
-
-suites = ['Clubes', 'Hearts','Spades','Diamonds']
-for i in range(13):
-    suite = suites[i]
-    for j in range(4):
-        if i == 1:
-            Game.stack.append( 'Ace' + ' of ' + suite)
-        elif i < 10:
-            Game.stack.append( str(j) + ' of ' + suite)
-        elif i == 10:
-            Game.stack.append( 'Bubbe' + ' of ' + suite)
-        elif i == 11:
-            Game.stack.append( 'Queen' + ' of ' + suite)
-        elif i == 12:
-            Game.stack.append( 'King' + ' of ' + suite)
-Game.stack.append('Black Jank')
-Game.stack.append('Red Jank')
-
->>>>>>> fd8d39ccc7ccb67b8cd67dbb069ccebf5316d23b
 while no_winner:
     game()
     time.sleep()
