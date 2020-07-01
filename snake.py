@@ -182,10 +182,10 @@ class Game:
                 i+=1
             if self.score > int(highscore) and newhighscore == False:
                 newhighscore = True
-                player_name = game.screen.textinput('You have scored a new highscore!','Enter your name below')
+                player_name = game.screen.textinput('You have scored a new high!','Enter your name below')
                 newhighscores.write(str(self.score) + ' , ' + player_name + '\n')
                 newhighscores.write(line)
-                print(str(self.score) + ' , ' + player_name + '\n')
+                print(str(self.score) + ' , ' + player_name + '  <-- NEW!!!\n')
                 print(line)
             elif n<9:
                 newhighscores.write(line)
