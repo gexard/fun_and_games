@@ -1,6 +1,7 @@
 import random
 import turtle
 import time
+import os
 
 class square:
 
@@ -111,6 +112,7 @@ class Game:
         self.screen.title("Snake")
         self.artist.fillcolor("green")
         self.pause = False
+        self.score = 0
 
     def nextFrame(self):
         while not self.snake.crashed:
@@ -124,6 +126,7 @@ class Game:
             self.artist.clear()
             if (self.snake.nextposition[0], self.snake.nextposition[1]) == (self.food.x, self.food.y):
                 self.snake.eatFood()
+                self.score += 1
                 self.food.changelocation()
             else:
                 self.snake.moveOneStep()
@@ -161,12 +164,44 @@ class Game:
             if unpause == 'r':
                 self.pause = False
 
+    def highscore(self):
+        highscores = open("highscores.csv")
+        newhighscores = open("newhighscores.csv",'w+')
+        newhighscore = False
+        print('Top 10 Highscores: \n')
+        n=0
+        for line in highscores:
+            comma = False
+            i = 0
+            highscore = ''
+            while comma == False:
+                if line[i]==' ':
+                    comma = True
+                else:
+                    highscore = highscore + line[i]
+                i+=1
+            if self.score > int(highscore) and newhighscore == False:
+                newhighscore = True
+                player_name = game.screen.textinput('You have scored a new highscore!','Enter your name below')
+                newhighscores.write(str(self.score) + ' , ' + player_name + '\n')
+                newhighscores.write(line)
+                print(str(self.score) + ' , ' + player_name + '\n')
+                print(line)
+            elif n<9:
+                newhighscores.write(line)
+                print(line)
+            n += 1
+        if newhighscore == True:
+            os.remove("highscores.csv")
+            os.rename("newhighscores.csv","highscores.csv")
+
 
 
 game = Game()
 play = 'y'
 while play == 'y':
     game.nextFrame()
+    game.highscore()
     play = game.screen.textinput("GAME OVER!","Enter y to play again.")
     game.snake.__init__()
     game.food.changelocation()
