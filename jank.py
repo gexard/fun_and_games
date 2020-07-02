@@ -77,6 +77,6 @@ class Game:
     def Cut(self):
         pass
 
-while True:
-    game()
+game = Game()
+while game.no_winner:
     time.sleep(0.1)
