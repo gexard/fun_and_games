@@ -6,23 +6,28 @@ import time
 from numpy import random
 
 broker_address = "127.0.0.1"
-pub = mqtt.Client("Main Game Publisher")
+pub = mqtt.Client("Game Publisher")
 pub.connect(broker_address)
 
 def on_message(client, userdata, message):
-    if message.topic == "Players/1/playcard":
-        print("Card played")
-    if message.topic == "Players/2/playcard":
-        print("Card played")
+    if message.topic == "Game/Winner":
+        Game.no_winner = False
+    elif message.topic == "Game/EndTurn":
+        Game.nextTurn()
+    elif message.topic == "Game/Players/AddPlayer":
+        Game.players.append(message.payload.decode('utf-8'))
+    for player in Game.players:
+        if message.topic == "Game/" + player + "/DrawCard":
+            Game.nextCard()
 
-listen = mqtt.Client("Main Game Listener")
+listen = mqtt.Client("Game Listener")
 listen.on_message = on_message
 listen.connect(broker_address)
 listen.loop_start()
 
-listen.subscribe("Players/+")
+listen.subscribe("Game/+")
 
-def deck():
+def CreateDeck():
     deck = []
     suites = ['Clubes', 'Hearts','Spades','Diamonds']
     for i in range(13):
@@ -42,46 +47,36 @@ def deck():
     deck.append('Red Jank')
     return deck
 
-class Player:
-
-    def __init__():
-        self.name = input("Player name: \n")
-
 class Game:
 
     def __init__(self):
-        self.deck = CreateStack()
-        self.stacks = {}
+        self.labeleddeck = CreateDeck()
+        self.deck = range(54)
+        self.nextcard = "none"
+        self.players = []
+        self.currentplayer = 0
+        self.no_winner = True
 
-    def nextCard():
+    def nextCard(self):
         l = len(self.deck)
         r = random.rand(l)
         self.nextcard = self.deck[r]
         del self.deck[r]
-        pub.publish("Mainstack/nextcard",game.nextcard)
+        pub.publish("Game/Deck/NextCard",self.nextcard)
 
     def shuffle(self):
-        stuff
+        #might not keep...
+        pass
 
-    def Cuts(self):
-        stuff
+    def nextTurn(self):
+        self.currentplayer += 1
+        if self.currentplayer > len(self.players):
+            self.currentplayer = 0
+        pub.publish("Game/Players/Turn",self.currentplayer)
 
-    def CallAJank(self):
-        stuff
+    def Cut(self):
+        pass
 
-    def CreateStack(self):
-        stuff
-
-    def KillStack(self):
-
-    def rule1(self):
-        if self.card == 'Jank':
-            print('Game over')
-
-    def cross(self):
-        stuff
-
-no_winner = True
-while no_winner:
+while True:
     game()
-    time.sleep()
+    time.sleep(0.1)
