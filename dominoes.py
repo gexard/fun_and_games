@@ -14,20 +14,20 @@ def on_message(client, userdata, message):
         player = message.payload.decode('utf-8')
         print(player + " has joined the game!\n")
         welcome_mesasage = "Welcome " + player + " to the game!"
-        pub.publish("Game/Welcome",welcome_message)
-        Game.players.append(player)
+        pub.publish("Game/Welcome", welcome_message)
+        game.players.append(player)
     elif message.topic == "Game/Winner":
-        Game.no_winner = False
+        game.no_winner = False
         print("The winner is: " + message.payload.decode('utf-8'))
     elif message.topic == "Game/EndTurn":
-        Game.nextTurn()
+        game.nextTurn()
     elif message.topic == "Game/Start":
         pub.publish("Game/Players/Turn", game.currentplayer, retain = True)
-        print("The game has started! \n")
-    for player in Game.players:
+        print("The game has started! The first player is: " + game.currentplayer + "\n")
+    for player in game.players:
         if message.topic == "Game/" + player + "/DrawPieces":
             for pieces in range(int(message.payload.decode('utf-8'))):
-                Game.nextPiece()
+                game.nextPiece()
 
 listen = mqtt.Client("Game Listener")
 listen.on_message = on_message

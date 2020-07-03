@@ -54,7 +54,7 @@ class Player:
         self.nextpieces = []
         self.side = ''
         self.name = input('Player Name: \n')
-        pub.publish("Game/AddPlayer",self.name)
+        pub.publish("Game/AddPlayer", self.name)
 
     def drawpiece(self,n):
         pub.publish('Game/' + self.name + '/DrawPieces',n)
