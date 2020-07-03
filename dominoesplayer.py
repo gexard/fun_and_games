@@ -18,8 +18,6 @@ def on_message(client, userdata, message):
         piece = message.payload.decode("utf-8")
         player.nextpieces.append(piece)
         print("you have drawn " + str(piece))
-    elif message.topic =="Game/Welcome":
-        print("Welcome " + messae.payload.decode('utf-8') + " to the game!")
     elif message.topic == "Game/Winner":
         player.piecesinhand = False
         print(message.payload.decode(utf-8) + ' has won!!!')
@@ -33,7 +31,7 @@ listen.on_message = on_message
 listen.connect(broker_address)
 listen.loop_start()
 
-listen.subscribe("Game/+")
+listen.subscribe("Game/+/+")
 
 def CreatePieces():
     pieces = []
@@ -57,9 +55,12 @@ class Player:
         pub.publish("Game/AddPlayer", self.name)
 
     def drawpiece(self,n):
+        print('Drawing ' + str(n) + ' pieces')
         pub.publish('Game/' + self.name + '/DrawPieces',n)
         time.sleep(n+2)
         self.hand.append(self.nextpieces)
+        print("Your current hand is: " + str(self.hand))
+
 
     def playpiece(self):
         print(self.hand)
@@ -74,7 +75,6 @@ player=Player()
 input("Are you ready to start? \n")
 pub.publish("Game/Start", payload=None)
 player.drawpiece(7)
-print("Your current hand is: " + str(player.hand))
 while player.piecesinhand:
     if player.turn:
         abletoplay = input("Enter 'y' if you can play a piece \n")

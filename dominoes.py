@@ -12,10 +12,8 @@ pub.connect(broker_address)
 def on_message(client, userdata, message):
     if message.topic == "Game/AddPlayer":
         player = message.payload.decode('utf-8')
-        print(player + " has joined the game!\n")
-        welcome_mesasage = "Welcome " + player + " to the game!"
-        pub.publish("Game/Welcome", welcome_message)
         game.players.append(player)
+        print('currently playing: ' + str(game.players))
     elif message.topic == "Game/Winner":
         game.no_winner = False
         print("The winner is: " + message.payload.decode('utf-8'))
@@ -27,14 +25,16 @@ def on_message(client, userdata, message):
     for player in game.players:
         if message.topic == "Game/" + player + "/DrawPieces":
             for pieces in range(int(message.payload.decode('utf-8'))):
+                print(player + ' is drawing a piece')
                 game.nextPiece()
+                time.sleep(1)
 
 listen = mqtt.Client("Game Listener")
 listen.on_message = on_message
 listen.connect(broker_address)
 listen.loop_start()
 
-listen.subscribe("Game/+")
+listen.subscribe("Game/+/+")
 
 def CreatePieces():
     pieces = []
@@ -55,11 +55,11 @@ class Game:
 
     def nextPiece(self):
         l = len(self.pieces)
-        r = random.rand(l)
+        r = random.randint(0,l)
         self.nextpiece = self.pieces[r]
         del self.pieces[r]
+        print(self.nextpiece)
         pub.publish("Game/Pieces/NextPiece",self.nextpiece)
-        time.sleep(1)
 
     def nextTurn(self):
         self.currentplayer += 1

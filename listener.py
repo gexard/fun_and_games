@@ -14,7 +14,7 @@ listen = mqtt.Client("Print Listener")
 listen.on_message = on_message
 listen.connect(broker_address)
 listen.loop_start()
-listen.subscribe("Game/+")
+listen.subscribe("Game/+/+")
 
 while True:
 	time.sleep(0.05)
