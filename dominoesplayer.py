@@ -9,29 +9,29 @@ pub = mqtt.Client("Player Publisher")
 pub.connect(broker_address)
 
 def on_message(client, userdata, message):
-    if message.topic == "Game/Players/Turn":
-        turn = message.payload.decode(utf-8)
+    if message.topic == "Game/Turn":
+        turn = message.payload.decode('utf-8')
         print('it is ' + str(turn) + "'s turn to play! \n")
         if turn == player.name:
             player.turn = True
-    elif message.topic == "Game/Pieces/NextPiece":
+    elif message.topic == "Game/NextPiece":
         piece = message.payload.decode("utf-8")
         player.nextpieces.append(piece)
         print("you have drawn " + str(piece))
     elif message.topic == "Game/Winner":
         player.piecesinhand = False
-        print(message.payload.decode(utf-8) + ' has won!!!')
-    elif message.topic == "Game/L/LastPiecePlayed":
-        self.game.append(message.payload.decode(utf-8))
-    elif message.topic == "Game/R/LastPiecePlayed":
-        self.game.insert(0,message.payload.decode(utf-8))
+        print(message.payload.decode('utf-8') + ' has won!!!')
+    elif message.topic == "Game/LLastPiecePlayed":
+        self.game.append(message.payload.decode('utf-8'))
+    elif message.topic == "Game/RLastPiecePlayed":
+        self.game.insert(0,message.payload.decode('utf-8'))
 
 listen = mqtt.Client("Player Listener")
 listen.on_message = on_message
 listen.connect(broker_address)
 listen.loop_start()
 
-listen.subscribe("Game/+/+")
+listen.subscribe("Game/+")
 
 def CreatePieces():
     pieces = []
@@ -56,7 +56,7 @@ class Player:
 
     def drawpiece(self,n):
         print('Drawing ' + str(n) + ' pieces')
-        pub.publish('Game/' + self.name + '/DrawPieces',n)
+        pub.publish('Game/' + self.name + 'DrawPieces',n)
         time.sleep(n+2)
         self.hand.append(self.nextpieces)
         print("Your current hand is: " + str(self.hand))
@@ -67,14 +67,15 @@ class Player:
         self.piecetoplay = input('What piece do you want to play? \n')
         self.side = input('Which side do you want to play it? (L or R)\n')
         if self.side == 'L':
-            pub.publish("Game/L/LastPiecePlayed",self.piecetoplay)
+            pub.publish("Game/LLastPiecePlayed",self.piecetoplay)
         elif self.side == 'R':
-            pub.publish("Game/R/LastPiecePlayed",self.piecetoplay)
+            pub.publish("Game/RLastPiecePlayed",self.piecetoplay)
 
 player=Player()
+player.drawpiece(7)
 input("Are you ready to start? \n")
 pub.publish("Game/Start", payload=None)
-player.drawpiece(7)
+time.sleep(1)
 while player.piecesinhand:
     if player.turn:
         abletoplay = input("Enter 'y' if you can play a piece \n")
