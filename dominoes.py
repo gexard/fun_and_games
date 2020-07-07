@@ -28,7 +28,6 @@ def on_message(client, userdata, message):
             for pieces in range(totalpieces):
                 print(player + ' is drawing a piece')
                 game.nextPiece()
-                time.sleep(1)
 
 listen = mqtt.Client("Game Listener")
 listen.on_message = on_message

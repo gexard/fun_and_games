@@ -21,10 +21,12 @@ def on_message(client, userdata, message):
     elif message.topic == "Game/Winner":
         player.piecesinhand = False
         print(message.payload.decode('utf-8') + ' has won!!!')
-    elif message.topic == "Game/LLastPiecePlayed":
-        self.game.append(message.payload.decode('utf-8'))
     elif message.topic == "Game/RLastPiecePlayed":
-        self.game.insert(0,message.payload.decode('utf-8'))
+        player.game.append(message.payload.decode('utf-8'))
+        print(player.game)
+    elif message.topic == "Game/LLastPiecePlayed":
+        player.game.insert(0,message.payload.decode('utf-8'))
+        print(player.game)
 
 listen = mqtt.Client("Player Listener")
 listen.on_message = on_message
@@ -57,7 +59,7 @@ class Player:
     def drawpiece(self,n):
         print('Drawing ' + str(n) + ' pieces')
         pub.publish('Game/' + self.name + 'DrawPieces',n)
-        time.sleep(n+2)
+        time.sleep(1)
         self.hand.append(self.nextpieces)
         print("Your current hand is: " + str(self.hand))
 
@@ -86,5 +88,6 @@ while player.piecesinhand:
         if len(player.hand) == 0:
             player.piecesinhand = False
             pub.publish('Game/Winner',player.name)
+        player.nextpieces = []
     time.sleep(0.1)
 pub.publish("Game/Winner", player.name)
