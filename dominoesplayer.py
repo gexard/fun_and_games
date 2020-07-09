@@ -14,10 +14,12 @@ def on_message(client, userdata, message):
         print('it is ' + str(turn) + "'s turn to play! \n")
         if turn == player.name:
             player.turn = True
+    elif message.topic == "Game/NoMorePieces":
+        player.piecestodraw = False
+        print("There are no more pieces to draw!")
     elif message.topic == "Game/NextPiece":
         piece = message.payload.decode("utf-8")
         player.nextpieces.append(piece)
-        print("you have drawn " + str(piece))
     elif message.topic == "Game/Winner":
         player.piecesinhand = False
         print(message.payload.decode('utf-8') + ' has won!!!')
@@ -49,6 +51,7 @@ class Player:
         self.hand = []
         self.turn = False
         self.piecesinhand = True
+        self.piecestodraw = True
         self.game = []
         self.piecetoplay = ()
         self.nextpieces = []
@@ -65,6 +68,7 @@ class Player:
 
 
     def playpiece(self):
+        print('Your pieces are: \n')
         print(self.hand)
         self.piecetoplay = input('What piece do you want to play? \n')
         self.side = input('Which side do you want to play it? (L or R)\n')
@@ -72,6 +76,11 @@ class Player:
             pub.publish("Game/LLastPiecePlayed",self.piecetoplay)
         elif self.side == 'R':
             pub.publish("Game/RLastPiecePlayed",self.piecetoplay)
+        self.turn = False
+        pub.publish("Game/EndTurn", payload=None)
+
+    def abletoplay(self):
+        pass
 
 player=Player()
 player.drawpiece(7)
@@ -83,8 +92,12 @@ while player.piecesinhand:
         abletoplay = input("Enter 'y' if you can play a piece \n")
         if abletoplay == 'y':
             player.playpiece()
-        else:
+        elif player.piecestodraw:
             player.drawpiece(1)
+        else:
+            print('It seems you cannot play :(\n')
+            self.turn = False
+            pub.publish("Game/EndTurn", payload=None)
         if len(player.hand) == 0:
             player.piecesinhand = False
             pub.publish('Game/Winner',player.name)
