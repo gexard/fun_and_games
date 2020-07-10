@@ -194,6 +194,8 @@ class Game:
         if newhighscore == True:
             os.remove("highscores.csv")
             os.rename("newhighscores.csv","highscores.csv")
+        else:
+            os.remove("newhighscores.csv")
 
 
 
