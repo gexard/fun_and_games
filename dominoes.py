@@ -46,21 +46,24 @@ def CreatePieces(n):
 class Game:
 
     def __init__(self):
+        self.remainingpieces = CreatePieces(7)
         self.pieces = CreatePieces(7)
-        self.nextpiece = 'none'
         self.players = []
         self.currentplayer = 0
         self.no_winner = True
 
-
-############## Need to change nextPiece in order to use only the index
     def nextPiece(self):
-        l = len(self.pieces)
+        l = len(self.remainingpieces)
         if l>0:
-            r = random.randint(0,l)
-            self.nextpiece = self.pieces[r]
-            del self.pieces[r]
-            pub.publish("Game/NextPiece",str(self.nextpiece))
+            c = True
+            while c:
+                r = random.randint(0,len(self.pieces))
+                if self.pieces[r] in self.remainingpieces:
+                    pass
+                else:
+                    c = False
+            del self.remainingpieces[r]
+            pub.publish("Game/NextPiece",str(r))
         else:
             pub.publish("Game/NoMorePieces", payload=None)
 

@@ -23,12 +23,13 @@ def on_message(client, userdata, message):
     elif message.topic == "Game/Winner":
         player.piecesinhand = False
         print(message.payload.decode('utf-8') + ' has won!!!')
-################change to piece index and transform to piece look here
     elif message.topic == "Game/RLastPiecePlayed":
-        player.game.append(message.payload.decode('utf-8'))
+        ppiece = int(message.payload.decode('utf-8'))
+        player.game.append(player.pieceref[ppiece])
         print(player.game)
     elif message.topic == "Game/LLastPiecePlayed":
-        player.game.insert(0,message.payload.decode('utf-8'))
+        ppiece = int(message.payload.decode('utf-8'))
+        player.game.insert(0,player.pieceref[ppiece])
         print(player.game)
 
 listen = mqtt.Client("Player Listener")
@@ -38,9 +39,8 @@ listen.loop_start()
 
 listen.subscribe("Game/+")
 
-def CreatePieces():
+def CreatePieces(n):
     pieces = []
-    n = 7
     for l in range(n):
         for r in range(n-l):
             pieces.append((l,n-1-r))
@@ -49,8 +49,9 @@ def CreatePieces():
 class Player:
 
     def __init__(self):
-        self.pieces = CreatePieces(7)
+        self.pieceref = CreatePieces(7)
         self.hand = []
+        self.vhand =[]
         self.turn = False
         self.piecesinhand = True
         self.piecestodraw = True
@@ -64,23 +65,23 @@ class Player:
         print('Drawing ' + str(n) + ' pieces')
         pub.publish('Game/' + self.name + 'DrawPieces',n)
         time.sleep(1)
-########### Using piece id 
+        print(self.nextpieces)
         for i in range(n):
             self.hand.append(self.nextpieces[i])
-        print("Your current hand is: " + str(self.hand))
+            self.vhand.append(self.pieceref[self.nextpieces[i]])
+        print("Your current hand is: " + str(self.vhand))
 
 
     def playpiece(self):
         print('Your pieces are: \n')
-        print(self.hand)
+        print(self.vhand)
         p = int(input('What piece do you want to play? (Enter its position)\n'))
-        self.piecetoplay = self.hand[p]
-        del self.piecetoplay[p]
         side = input('Which side do you want to play it? (L or R)\n')
         if side == 'L':
-            pub.publish("Game/LLastPiecePlayed",self.piecetoplay)
+            pub.publish("Game/LLastPiecePlayed",self.hand[p])
         elif side == 'R':
-            pub.publish("Game/RLastPiecePlayed",self.piecetoplay)
+            pub.publish("Game/RLastPiecePlayed",self.hand[p])
+        del self.hand[p]
         self.turn = False
         pub.publish("Game/EndTurn", payload=None)
 
