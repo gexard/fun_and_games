@@ -52,6 +52,8 @@ class Game:
         self.currentplayer = 0
         self.no_winner = True
 
+
+############## Need to change nextPiece in order to use only the index
     def nextPiece(self):
         l = len(self.pieces)
         if l>0:

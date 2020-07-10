@@ -18,11 +18,12 @@ def on_message(client, userdata, message):
         player.piecestodraw = False
         print("There are no more pieces to draw!")
     elif message.topic == "Game/NextPiece":
-        piece = message.payload.decode("utf-8")
+        piece = int(message.payload.decode("utf-8"))
         player.nextpieces.append(piece)
     elif message.topic == "Game/Winner":
         player.piecesinhand = False
         print(message.payload.decode('utf-8') + ' has won!!!')
+################change to piece index and transform to piece look here
     elif message.topic == "Game/RLastPiecePlayed":
         player.game.append(message.payload.decode('utf-8'))
         print(player.game)
@@ -48,6 +49,7 @@ def CreatePieces():
 class Player:
 
     def __init__(self):
+        self.pieces = CreatePieces(7)
         self.hand = []
         self.turn = False
         self.piecesinhand = True
@@ -55,7 +57,6 @@ class Player:
         self.game = []
         self.piecetoplay = ()
         self.nextpieces = []
-        self.side = ''
         self.name = input('Player Name: \n')
         pub.publish("Game/AddPlayer", self.name)
 
@@ -63,18 +64,22 @@ class Player:
         print('Drawing ' + str(n) + ' pieces')
         pub.publish('Game/' + self.name + 'DrawPieces',n)
         time.sleep(1)
-        self.hand.append(self.nextpieces)
+########### Using piece id 
+        for i in range(n):
+            self.hand.append(self.nextpieces[i])
         print("Your current hand is: " + str(self.hand))
 
 
     def playpiece(self):
         print('Your pieces are: \n')
         print(self.hand)
-        self.piecetoplay = input('What piece do you want to play? \n')
-        self.side = input('Which side do you want to play it? (L or R)\n')
-        if self.side == 'L':
+        p = int(input('What piece do you want to play? (Enter its position)\n'))
+        self.piecetoplay = self.hand[p]
+        del self.piecetoplay[p]
+        side = input('Which side do you want to play it? (L or R)\n')
+        if side == 'L':
             pub.publish("Game/LLastPiecePlayed",self.piecetoplay)
-        elif self.side == 'R':
+        elif side == 'R':
             pub.publish("Game/RLastPiecePlayed",self.piecetoplay)
         self.turn = False
         pub.publish("Game/EndTurn", payload=None)
