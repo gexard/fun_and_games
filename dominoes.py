@@ -36,9 +36,8 @@ listen.loop_start()
 
 listen.subscribe("Game/+")
 
-def CreatePieces():
+def CreatePieces(n):
     pieces = []
-    n = 7
     for l in range(n):
         for r in range(n-l):
             pieces.append((l,n-1-r))
@@ -47,18 +46,26 @@ def CreatePieces():
 class Game:
 
     def __init__(self):
-        self.pieces = CreatePieces()
-        self.nextpiece = 'none'
+        self.remainingpieces = CreatePieces(7)
+        self.pieces = CreatePieces(7)
         self.players = []
         self.currentplayer = 0
         self.no_winner = True
 
     def nextPiece(self):
-        l = len(self.pieces)
-        r = random.randint(0,l)
-        self.nextpiece = self.pieces[r]
-        del self.pieces[r]
-        pub.publish("Game/NextPiece",str(self.nextpiece))
+        l = len(self.remainingpieces)
+        if l>0:
+            c = True
+            while c:
+                r = random.randint(0,len(self.pieces))
+                if self.pieces[r] in self.remainingpieces:
+                    pass
+                else:
+                    c = False
+            del self.remainingpieces[r]
+            pub.publish("Game/NextPiece",str(r))
+        else:
+            pub.publish("Game/NoMorePieces", payload=None)
 
     def nextTurn(self):
         self.currentplayer += 1
