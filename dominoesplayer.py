@@ -18,6 +18,8 @@ def on_message(client, userdata, message):
     elif message.topic == "Game/NoMorePieces":
         player.piecestodraw = False
         print("There are no more pieces to draw!")
+    elif message.topic == "Game/FinishedDealing":
+        player.wait = False
     elif message.topic == "Game/NextPiece":
         piece = int(message.payload.decode("utf-8"))
         player.nextpieces.append(piece)
@@ -58,6 +60,7 @@ class Player:
         self.piecestodraw = True
         self.game = []
         self.piecetoplay = ()
+        self.wait = True
         self.nextpieces = []
         self.name = input('Player Name: \n')
         pub.publish("Game/AddPlayer", self.name)
@@ -65,7 +68,9 @@ class Player:
     def drawpiece(self,n):
         print('Drawing ' + str(n) + ' pieces')
         pub.publish('Game/' + self.name + 'DrawPieces',n)
-        time.sleep(1)
+        self.wait = True
+        while self.wait:
+            time.sleep(0.1)
         print(self.nextpieces)
         for i in range(n):
             self.hand.append(self.nextpieces[i])
