@@ -23,14 +23,12 @@ def on_message(client, userdata, message):
     elif message.topic == "Game/Start":
         pub.publish("Game/Turn", game.players[game.currentplayer])
         print("The game has started! The first player is: " + game.players[game.currentplayer] + "\n")
-    for player in game.players:
-        if message.topic == "Game/" + player + "DrawPieces":
-            totalpieces = int(message.payload.decode('utf-8'))
-            print(totalpieces)
-            for pieces in range(totalpieces):
-                print(player + ' is drawing a piece')
-                game.nextPiece()
-            pub.publish("Game/FinishedDealing", payload=None)
+    elif message.topic == "Game/DrawPieces":
+        totalpieces = int(message.payload.decode('utf-8'))
+        for pieces in range(totalpieces):
+            print('Dealing...')
+            game.nextPiece()
+        pub.publish("Game/FinishedDealing", payload=None)
 
 listen = mqtt.Client("Game Listener")
 listen.on_message = on_message
@@ -59,11 +57,11 @@ class Game:
         l = len(self.remainingpieces)
         if l>0:
             c = True
+            p=0
             while c:
                 r = random.randint(0,len(self.pieces))
                 if self.pieces[r] in self.remainingpieces:
                     c = False
-                print(c)
             del self.remainingpieces[r]
             pub.publish("Game/NextPiece",str(r))
         else:

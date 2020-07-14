@@ -13,6 +13,8 @@ def on_message(client, userdata, message):
     if message.topic == "Game/Turn":
         turn = message.payload.decode('utf-8')
         print('it is ' + str(turn) + "'s turn to play! \n")
+        print(turn)
+        print(player.name)
         if turn == player.name:
             player.turn = True
     elif message.topic == "Game/NoMorePieces":
@@ -67,11 +69,10 @@ class Player:
 
     def drawpiece(self,n):
         print('Drawing ' + str(n) + ' pieces')
-        pub.publish('Game/' + self.name + 'DrawPieces',n)
+        pub.publish('Game/DrawPieces', n)
         self.wait = True
         while self.wait:
             time.sleep(0.1)
-        print(self.nextpieces)
         for i in range(n):
             self.hand.append(self.nextpieces[i])
             self.vhand.append(self.pieceref[self.nextpieces[i]])
@@ -79,7 +80,7 @@ class Player:
 
 
     def playpiece(self):
-        print('Your pieces are: \n')
+        print('Your pieces are: ')
         print(self.vhand)
         p = int(input('What piece do you want to play? (Enter its position)\n'))
         side = input('Which side do you want to play it? (L or R)\n')
