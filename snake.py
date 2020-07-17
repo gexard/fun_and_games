@@ -45,6 +45,24 @@ class food:
         else:
             self.state = "ON"
 
+class border:
+
+    def __init__(self):
+        self.border = []
+        self.bordercordinates = []
+        self.drawborder()
+
+    def drawborder(self):
+        for i in range(23):
+            for j in range(23):
+                if i==22 or i==0 or j==0 or j==22:
+                    self.border.append(square(i*20-220,j*20-220))
+                    self.bordercordinates.append((i*20-220,j*20-220))
+
+    def drawself(self, turtle):
+        for segment in self.border:
+            segment.drawself(turtle)
+
 class snake:
 
     def __init__(self):
@@ -59,16 +77,18 @@ class snake:
 
     def moveOneStep(self):
 
-        if (self.nextposition[0], self.nextposition[1]) not in self.currentbody:
+        if (self.nextposition[0], self.nextposition[1]) in self.currentbody:
+            self.crashed = True
+        elif (self.nextposition[0], self.nextposition[1]) in game.border.bordercordinates:
+            self.crashed = True
+        else:
             self.body.append(square(self.nextposition[0], self.nextposition[1]))
             self.currentbody.append((self.nextposition[0], self.nextposition[1]))
             del self.body[0]
             del self.currentbody[0]
             self.headposition[0], self.headposition[1] = self.body[-1].x, self.body[-1].y
             self.nextposition = [self.headposition[0] + 20*self.nextX,
-                                 self.headposition[1] + 20*self.nextY]
-        else:
-            self.crashed = True
+            self.headposition[1] + 20*self.nextY]
 
     def moveup(self):
         self.nextX = 0
@@ -104,6 +124,7 @@ class Game:
         self.artist = turtle.Turtle()
         self.artist.up()
         self.artist.hideturtle()
+        self.border = border()
         self.snake = snake()
         self.food = food(100, 0)
         self.counter = 0
@@ -133,6 +154,9 @@ class Game:
             self.food.changestate()
             self.food.drawself(self.artist)
             self.snake.drawself(self.artist)
+            self.artist.fillcolor("red")
+            self.border.drawself(self.artist)
+            self.artist.fillcolor("green")
             turtle.update()
             self.commandpending = False
             time.sleep(0.1)
