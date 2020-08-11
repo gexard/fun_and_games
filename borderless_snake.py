@@ -165,7 +165,7 @@ class Game:
                 self.pause = False
 
     def highscore(self):
-        highscores = open("highscores.csv")
+        highscores = open("bhighscores.csv")
         newhighscores = open("newhighscores.csv",'w+')
         newhighscore = False
         print('Top 10 Highscores: \n')
@@ -192,8 +192,8 @@ class Game:
                 print(line)
             n += 1
         if newhighscore == True:
-            os.remove("highscores.csv")
-            os.rename("newhighscores.csv","highscores.csv")
+            os.remove("bhighscores.csv")
+            os.rename("newhighscores.csv","bhighscores.csv")
         else:
             os.remove("newhighscores.csv")
 
