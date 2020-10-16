@@ -37,11 +37,17 @@ listen.loop_start()
 
 listen.subscribe("Game/+")
 
+class piece:
+
+    def __init__(self,l,r):
+        self.left = l
+        self.rigt = r
+
 def CreatePieces(n):
     pieces = []
     for l in range(n):
         for r in range(n-l):
-            pieces.append((l,n-1-r))
+            pieces.append(piece(l,n-1-r))
     return pieces
 
 class Game:
