@@ -95,7 +95,12 @@ class snake:
 
     def drawself(self, turtle):
         for segment in self.body:
-            segment.drawself(turtle)
+            if segment.x == self.headposition[0] and segment.y == self.headposition[1] :
+                turtle.fillcolor("red")
+                segment.drawself(turtle)
+                turtle.fillcolor("green")
+            else:
+                segment.drawself(turtle)
 
 class Game:
 
@@ -133,6 +138,15 @@ class Game:
             self.food.changestate()
             self.food.drawself(self.artist)
             self.snake.drawself(self.artist)
+
+            turtle.clear()
+            turtle.tracer(0)
+            turtle.hideturtle()
+            turtle.color("white")
+            turtle.penup()
+            turtle.setposition(300,300)
+            turtle.write("Score: " + str(self.score), False, align = "right", font = ("Arial", 14, "normal"))
+
             turtle.update()
             self.commandpending = False
             time.sleep(0.1)
