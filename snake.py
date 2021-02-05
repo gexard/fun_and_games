@@ -91,20 +91,24 @@ class snake:
             self.headposition[1] + 20*self.nextY]
 
     def moveup(self):
-        self.nextX = 0
-        self.nextY = 1
+        if self.nextY != -1:
+            self.nextX = 0
+            self.nextY = 1
 
     def moveleft(self):
-        self.nextX = -1
-        self.nextY = 0
+        if self.nextX != 1:
+            self.nextX = -1
+            self.nextY = 0
 
     def moveright(self):
-        self.nextX = 1
-        self.nextY = 0
+        if self.nextX != -1:
+            self.nextX = 1
+            self.nextY = 0
 
     def movedown(self):
-        self.nextX = 0
-        self.nextY = -1
+        if self.nextY != 1:
+            self.nextX = 0
+            self.nextY = -1
 
     def eatFood(self):
         self.body.append(square(self.nextposition[0], self.nextposition[1]))
@@ -243,4 +247,5 @@ while play == 'y':
     play = game.screen.textinput("GAME OVER!","Enter y to play again.")
     game.snake.__init__()
     game.food.changelocation()
+    game.score = 0
 #game.screen.mainloop()
