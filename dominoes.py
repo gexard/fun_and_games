@@ -1,6 +1,5 @@
 # Author: Gerardo Sanchez
 # Date Created: July 2, 2020
-# Last Updated: July 13, 2020
 
 import paho.mqtt.client as mqtt
 import time

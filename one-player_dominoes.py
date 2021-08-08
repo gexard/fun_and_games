@@ -1,59 +1,47 @@
 # Author: Gerardo Sanchez
-# Date Created: July 2, 2020
+# Date Created: May 1, 2021
 
-import paho.mqtt.client as mqtt
-import time
+from numpy import random
 
-broker_address = "127.0.0.1"
-pub = mqtt.Client("Player 2 Publisher")
-pub.connect(broker_address)
+class piece:
+    """a single piece."""
 
-def on_message(client, userdata, message):
-    if message.topic == "Game/Turn":
-        turn = message.payload.decode('utf-8')
-        print('it is ' + str(turn) + "'s turn to play! \n")
-        print(turn)
-        print(player.name)
-        if turn == player.name:
-            player.turn = True
-    elif message.topic == "Game/NoMorePieces":
-        player.piecestodraw = False
-        print("There are no more pieces to draw!")
-    elif message.topic == "Game/FinishedDealing":
-        player.wait = False
-    elif message.topic == "Game/NextPiece":
-        piece = int(message.payload.decode("utf-8"))
-        player.nextpieces.append(piece)
-    elif message.topic == "Game/Winner":
-        player.piecesinhand = False
-        print(message.payload.decode('utf-8') + ' has won!!!')
-    elif message.topic == "Game/RLastPiecePlayed":
-        ppiece = int(message.payload.decode('utf-8'))
-        player.game.append(player.pieceref[ppiece])
-        print(player.game)
-    elif message.topic == "Game/LLastPiecePlayed":
-        ppiece = int(message.payload.decode('utf-8'))
-        player.game.insert(0,player.pieceref[ppiece])
-        print(player.game)
-
-listen = mqtt.Client("Player 2 Listener")
-listen.on_message = on_message
-listen.connect(broker_address)
-listen.loop_start()
-
-listen.subscribe("Game/+")
+    def __init__(self, l, r):
+        self.left = l
+        self.right = r
 
 def CreatePieces(n):
     pieces = []
     for l in range(n):
         for r in range(n-l):
-            pieces.append((l,n-1-r))
+            pieces.append(piece(l,n-1-r))
     return pieces
+
+class Game:
+
+    def __init__(self):
+        self.pieces = CreatePieces(7)
+        self.remainingpieces = CreatePieces(7)
+        self.no_winner = True
+
+    def nextPiece(self):
+        l = len(self.remainingpieces)
+        if l > 0:
+            c = True
+            p = 0
+            while c:
+                r = random.randint(0,len(self.pieces))
+                if self.pieces[r] in self.remainingpieces:
+                    c = False
+            del self.remainingpieces[r]
+        else:
+            print('The pile ran out of pieces!')
+
+    def nextTurn(self):
 
 class Player:
 
     def __init__(self):
-        self.pieceref = CreatePieces(7)
         self.hand = []
         self.vhand =[]
         self.turn = False
@@ -64,7 +52,7 @@ class Player:
         self.wait = True
         self.nextpieces = []
         self.name = input('Player Name: \n')
-        pub.publish("Game/AddPlayer", self.name)
+        self.drawpiece(7)
 
     def drawpiece(self,n):
         print('Drawing ' + str(n) + ' pieces')
@@ -94,11 +82,13 @@ class Player:
     def abletoplay(self):
         pass
 
-player=Player()
-player.drawpiece(7)
-input("Are you ready to start? \n")
-pub.publish("Game/Start", payload=None)
-time.sleep(1)
+class Bots:
+
+    def __init__(self,n):
+        for i in n:
+            self.bots.append()
+
+
 while player.piecesinhand:
     if player.turn:
         abletoplay = input("Enter 'y' if you can play a piece \n")
@@ -116,3 +106,11 @@ while player.piecesinhand:
         player.nextpieces = []
     time.sleep(0.1)
 pub.publish("Game/Winner", player.name)
+
+
+game = Game()
+player = Player()
+num_of_bots = input('How many bots? \n')
+bots = Bots(num_of_bots)
+while game.no_winner:
+    time.sleep(0.1)
